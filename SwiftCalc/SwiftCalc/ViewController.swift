@@ -22,8 +22,17 @@ class ViewController: UIViewController {
     // TODO: This looks like a good place to add some data structures.
     //       One data structure is initialized below for reference.
     var someDataStructure: [String] = [""]
+    let operators = ["/", "*", "-", "+", "="]
+    let others = ["C", "+/-", "%"]
+    let special = ["0", "."]
+    var firstNumber = ""
+    var currentOperator = ""
     
-
+    var exactValue = 0.0
+    var validOperator = false
+    var prevOperator = false //refers to whether the previous value was an operator
+    var dotOperator = false
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         view = UIView(frame: UIScreen.main.bounds)
@@ -52,7 +61,121 @@ class ViewController: UIViewController {
     // TODO: Ensure that resultLabel gets updated.
     //       Modify this one or create your own.
     func updateResultLabel(_ content: String) {
-        print("Update me like one of those PCs")
+        var label = self.resultLabel.text!
+        //let numberLabel = Int(self.resultLabel.text!)
+        //let firstNumberLabel = Int(firstNumber)
+        let count = label.characters.count
+        if(others.contains(content)){
+            if(content == "C"){
+                self.resultLabel.text = "0"
+                firstNumber = ""
+                currentOperator = ""
+                validOperator = false
+                prevOperator = false
+            }
+            if(content == "+/-"){
+                let value = -Double(self.resultLabel.text!)!
+                
+                if(value.truncatingRemainder(dividingBy:1) == 0){
+                    let text = String(Int(value))
+                    if (text.characters.count <= 7){
+                        self.resultLabel.text = text
+                    }
+                }
+                else{
+                    let text = String(value)
+                    if(text.characters.count <= 7){
+                        self.resultLabel.text = text
+                    }
+                    
+                }
+            }
+            return
+        }
+        if (operators.contains(content)){
+            print("So we see operators")
+            if(firstNumber == "" && content != "="){
+                firstNumber = self.resultLabel.text!
+                prevOperator = true
+                currentOperator = content
+            }
+            else{
+                if(content == "="){
+                    //let newText = String(intCalculate(a: firstNumberLabel!,b: numberLabel!, operation:currentOperator))
+                    let newText = calculate(a: firstNumber,b: label, operation:currentOperator)
+                    exactValue = newText
+                    firstNumber = ""
+                    currentOperator = ""
+                    if(newText.truncatingRemainder(dividingBy:1) == 0){
+                        self.resultLabel.text = String(Int(newText))
+                    }else{
+                        self.resultLabel.text = String(newText)
+                    }
+                }
+                else{
+                    if (prevOperator == true){
+                        currentOperator = content
+                        return
+                    }
+                    //use previous currentOperator, then add again.
+                    //let newText = String(intCalculate(a: firstNumberLabel!,b: numberLabel!, operation:currentOperator))
+                    let newText = calculate(a: firstNumber,b: label, operation:currentOperator)
+                    exactValue = newText
+                    currentOperator = content
+                    prevOperator = true
+                    if(newText.truncatingRemainder(dividingBy:1) == 0){
+                        self.resultLabel.text = String(Int(newText))
+                        firstNumber = String(Int(newText))
+                    }else{
+                        firstNumber = String(newText)
+                        self.resultLabel.text = String(newText)
+                    }
+                    
+                }
+            }
+            return;
+        }
+        if(special.contains(content)){
+            if(content == "0"){
+                if(count != 7){
+                    if(self.resultLabel.text == "0" || prevOperator == true){
+                        self.resultLabel.text = "0"
+                    }
+                    else{
+                        self.resultLabel.text = label + content;
+                    }
+                }
+            }
+            if(content == "."){
+                if(count != 7){
+                    
+                    if(self.resultLabel.text == "0" || prevOperator == true){
+                        self.resultLabel.text = "0."
+                    }
+                    else{
+                        if(self.resultLabel.text!.range(of: ".") == nil){
+                            self.resultLabel.text = label + content;
+                        }
+                        else{
+                            //equivalent of empty operation
+                            return
+                        }
+                    }
+                }
+            }
+            prevOperator = false
+            return
+        }
+        if (self.resultLabel.text == "0" || prevOperator == true){
+            self.resultLabel.text = content
+        }
+        else if (count >= 7){
+            return
+        }
+        else{
+            self.resultLabel.text = label + content;
+        }
+        prevOperator = false
     }
     
     
@@ -65,6 +188,18 @@ class ViewController: UIViewController {
     // TODO: A simple calculate method for integers.
     //       Modify this one or create your own.
     func intCalculate(a: Int, b:Int, operation: String) -> Int {
+        if(operation == "-"){
+            return a-b
+        }
+        else if(operation == "+"){
+            return a+b
+        }
+        else if(operation == "/"){
+            return a/b
+        }
+        else if(operation == "*"){
+            return a*b
+        }
         print("Calculation requested for \(a) \(operation) \(b)")
         return 0
     }
@@ -72,6 +207,22 @@ class ViewController: UIViewController {
     // TODO: A general calculate method for doubles
     //       Modify this one or create your own.
     func calculate(a: String, b:String, operation: String) -> Double {
+        let dA = Double(a)!
+        //let dA = Double(a)
+        //let Da = exactValue
+        let dB = Double(b)!
+        if(operation == "-"){
+            return dA-dB
+        }
+        else if(operation == "+"){
+            return dA+dB
+        }
+        else if(operation == "/"){
+            return dA/dB
+        }
+        else if(operation == "*"){
+            return dA*dB
+        }
         print("Calculation requested for \(a) \(operation) \(b)")
         return 0.0
     }
@@ -79,18 +230,31 @@ class ViewController: UIViewController {
     // REQUIRED: The responder to a number button being pressed.
     func numberPressed(_ sender: CustomButton) {
         guard Int(sender.content) != nil else { return }
+        updateResultLabel(sender.content)
         print("The number \(sender.content) was pressed")
         // Fill me in!
     }
     
     // REQUIRED: The responder to an operator button being pressed.
     func operatorPressed(_ sender: CustomButton) {
-        // Fill me in!
+        if operators.contains(sender.content) || others.contains(sender.content) {
+            print("The button \(sender.content) was pressed")
+            updateResultLabel(sender.content)
+        }
+        else{
+            return
+        }
     }
     
     // REQUIRED: The responder to a number or operator button being pressed.
     func buttonPressed(_ sender: CustomButton) {
-       // Fill me in!
+        if special.contains(sender.content) {
+            print("The button \(sender.content) was pressed")
+            updateResultLabel(sender.content)
+        }
+        else{
+            return
+        }
     }
     
     // IMPORTANT: Do NOT change any of the code below.
