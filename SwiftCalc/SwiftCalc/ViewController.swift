@@ -110,10 +110,10 @@ class ViewController: UIViewController {
                     if(newText > 9999999 || newText < -999999){
                         return
                     }
-                    if(0 > newText && newText > -0.000001){
+                    if(0 > newText && newText > -0.0001){
                         return
                     }
-                    if(0 < newText && newText < 0.0000001){
+                    if(0 < newText && newText < 0.00001){
                         return
                     }
 
@@ -142,10 +142,10 @@ class ViewController: UIViewController {
                     if(newText > 9999999 || newText < -999999){
                         return
                     }
-                    if(0 > newText && newText > -0.000001){
+                    if(0 > newText && newText > -0.0001){
                         return
                     }
-                    if(0 < newText && newText < 0.0000001){
+                    if(0 < newText && newText < 0.00001){
                         return
                     }
                     exactValue = newText
