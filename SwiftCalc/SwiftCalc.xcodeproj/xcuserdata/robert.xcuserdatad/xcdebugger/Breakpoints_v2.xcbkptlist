@@ -10,12 +10,12 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "SwiftCalc/ViewController.swift"
-            timestampString = "497252094.341114"
+            timestampString = "497414366.751284"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "68"
-            endingLineNumber = "68"
-            landmarkName = "updateResultLabel(_:)"
+            startingLineNumber = "58"
+            endingLineNumber = "58"
+            landmarkName = "updateSomeDataStructure(_:)"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>

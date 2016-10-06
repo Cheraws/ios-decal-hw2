@@ -95,22 +95,41 @@ class ViewController: UIViewController {
         if (operators.contains(content)){
             print("So we see operators")
             if(firstNumber == "" && content != "="){
+                //first operation
                 firstNumber = self.resultLabel.text!
+                exactValue = Double(label)!
                 prevOperator = true
                 currentOperator = content
             }
+
             else{
+                
                 if(content == "="){
                     //let newText = String(intCalculate(a: firstNumberLabel!,b: numberLabel!, operation:currentOperator))
-                    let newText = calculate(a: firstNumber,b: label, operation:currentOperator)
+                    let newText = calculate(a: exactValue,b: label, operation:currentOperator)
+                    if(newText > 9999999 || newText < -999999){
+                        return
+                    }
+                    if(0 > newText && newText > -0.000001){
+                        return
+                    }
+                    if(0 < newText && newText < 0.0000001){
+                        return
+                    }
+
                     exactValue = newText
                     firstNumber = ""
-                    currentOperator = ""
+                    currentOperator = "="
                     if(newText.truncatingRemainder(dividingBy:1) == 0){
                         self.resultLabel.text = String(Int(newText))
                     }else{
                         self.resultLabel.text = String(newText)
                     }
+                    label = self.resultLabel.text!
+                    if(label.characters.count > 7){
+                        self.resultLabel.text = (label as NSString).substring(to: 7)
+                    }
+
                 }
                 else{
                     if (prevOperator == true){
@@ -119,16 +138,31 @@ class ViewController: UIViewController {
                     }
                     //use previous currentOperator, then add again.
                     //let newText = String(intCalculate(a: firstNumberLabel!,b: numberLabel!, operation:currentOperator))
-                    let newText = calculate(a: firstNumber,b: label, operation:currentOperator)
+                    let newText = calculate(a: exactValue,b: label, operation:currentOperator)
+                    if(newText > 9999999 || newText < -999999){
+                        return
+                    }
+                    if(0 > newText && newText > -0.000001){
+                        return
+                    }
+                    if(0 < newText && newText < 0.0000001){
+                        return
+                    }
                     exactValue = newText
                     currentOperator = content
                     prevOperator = true
                     if(newText.truncatingRemainder(dividingBy:1) == 0){
                         self.resultLabel.text = String(Int(newText))
                         firstNumber = String(Int(newText))
+                        exactValue = newText
                     }else{
                         firstNumber = String(newText)
                         self.resultLabel.text = String(newText)
+                        exactValue = newText
+                    }
+                    label = self.resultLabel.text!
+                    if(label.characters.count > 7){
+                        self.resultLabel.text = (label as NSString).substring(to: 7)
                     }
                     
                 }
@@ -206,8 +240,9 @@ class ViewController: UIViewController {
     
     // TODO: A general calculate method for doubles
     //       Modify this one or create your own.
-    func calculate(a: String, b:String, operation: String) -> Double {
-        let dA = Double(a)!
+    func calculate(a: Double, b:String, operation: String) -> Double {
+        //let dA = Double(a)!
+        let dA = a
         //let dA = Double(a)
         //let Da = exactValue
         let dB = Double(b)!
@@ -226,7 +261,7 @@ class ViewController: UIViewController {
         print("Calculation requested for \(a) \(operation) \(b)")
         return 0.0
     }
-    
+
     // REQUIRED: The responder to a number button being pressed.
     func numberPressed(_ sender: CustomButton) {
         guard Int(sender.content) != nil else { return }
